@@ -12,7 +12,8 @@
     "custom/prompt_chaining_agent": "./apps/agents/src/custom-agents/prompt_chaining/graph.ts:graph",
     "custom/parallelization_agent": "./apps/agents/src/custom-agents/parallelization/graph.ts:graph",
     "custom/routing_agent": "./apps/agents/src/custom-agents/routing/graph.ts:graph",
-    "custom/orchestrator_worker": "./apps/agents/src/custom-agents/orchestrator-worker/graph.ts:graph"
+    "custom/orchestrator_worker": "./apps/agents/src/custom-agents/orchestrator-worker/graph.ts:graph",
+    "custom/evaluator_optimizer": "./apps/agents/src/custom-agents/evaluator-optimizer/graph.ts:graph"
   },
   "env": ".env"
 }
