@@ -68,6 +68,3 @@ export const graph = parallelWorkflow.compile({
     interruptBefore: [], // if you want to update the state before calling the tools
     interruptAfter: [],
 });
-
-// Invoke
-const state = await graph.invoke({ topic: "cats" });
