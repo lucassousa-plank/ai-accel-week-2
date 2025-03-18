@@ -1,4 +1,4 @@
-import { StateGraph, Annotation, GraphRecursionError } from "@langchain/langgraph";
+import { StateGraph, Annotation } from "@langchain/langgraph";
 import { AgentConfigurationAnnotation } from "./configuration.js";
 import { Command } from "@langchain/langgraph";
 
