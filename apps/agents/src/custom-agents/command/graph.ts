@@ -12,7 +12,6 @@ const StateAnnotation = Annotation.Root({
 // Define node functions
 // Nodes
 const nodeASubgraph = async (_state: typeof StateAnnotation.State) => {
-    console.log("Called A");
     // this is a replacement for a real conditional edge function
     const goto = Math.random() > .5 ? "nodeB" : "nodeC";
     // note how Command allows you to BOTH update the graph state AND route to the next node
@@ -29,14 +28,12 @@ const nodeASubgraph = async (_state: typeof StateAnnotation.State) => {
 
 // Nodes B and C are unchanged
 const nodeB = async (state: typeof StateAnnotation.State) => {
-    console.log("Called B");
     return {
         foo: state.foo + "|b",
     };
 }
 
 const nodeC = async (state: typeof StateAnnotation.State) => {
-    console.log("Called C");
     return {
         foo: state.foo + "|c",
     };

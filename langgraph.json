@@ -15,7 +15,8 @@
     "custom/orchestrator_worker": "./apps/agents/src/custom-agents/orchestrator-worker/graph.ts:graph",
     "custom/evaluator_optimizer": "./apps/agents/src/custom-agents/evaluator-optimizer/graph.ts:graph",
     "custom/recursion_limit": "./apps/agents/src/custom-agents/recursion-limit/graph.ts:graph",
-    "custom/command": "./apps/agents/src/custom-agents/command/graph.ts:graph"
+    "custom/command": "./apps/agents/src/custom-agents/command/graph.ts:graph",
+    "custom/branching": "./apps/agents/src/custom-agents/branching/graph.ts:graph"
   },
   "env": ".env"
 }
