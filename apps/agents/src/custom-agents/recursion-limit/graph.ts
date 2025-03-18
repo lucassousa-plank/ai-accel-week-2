@@ -1,5 +1,4 @@
 import { StateGraph, Annotation, END, GraphRecursionError } from "@langchain/langgraph";
-import { AgentConfigurationAnnotation } from "./configuration.js";
 
 // Graph state
 // Define the state with a reducer
@@ -64,7 +63,7 @@ const endRouterMod3 = async function (state: typeof StateAnnotation.State) {
 }
 
 // Build workflow
-const graphWithLoops = new StateGraph(StateAnnotation, AgentConfigurationAnnotation)
+const graphWithLoops = new StateGraph(StateAnnotation)
     .addNode("countMod1", countMod1)
     .addNode("countMod2", countMod2)
     .addNode("countMod3", countMod3)

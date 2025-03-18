@@ -1,6 +1,4 @@
 import { StateGraph, Annotation, START, END } from "@langchain/langgraph";
-import { AgentConfigurationAnnotation } from "./configuration.js";
-
 // Graph state
 // Define the state with a reducer
 type ScoredValue = {
@@ -87,7 +85,7 @@ const fanoutSink = (state: typeof ConditionalBranchingAnnotation.State) => {
 };
   
 
-const branchingGraph = new StateGraph(ConditionalBranchingAnnotation, AgentConfigurationAnnotation)
+const branchingGraph = new StateGraph(ConditionalBranchingAnnotation)
     .addNode("a", nodeA)
     .addNode("b", nodeB)
     .addNode("c", nodeC)

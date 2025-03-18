@@ -1,5 +1,4 @@
 import { StateGraph, Annotation } from "@langchain/langgraph";
-import { AgentConfigurationAnnotation } from "./configuration.js";
 import { Command } from "@langchain/langgraph";
 
 // Graph state
@@ -47,7 +46,7 @@ const subgraph = new StateGraph(StateAnnotation)
 
 // Build workflow
 // NOTE: there are no edges between nodes A, B and C!
-const commandGraph = new StateGraph(StateAnnotation, AgentConfigurationAnnotation)
+const commandGraph = new StateGraph(StateAnnotation)
     .addNode("subgraph", subgraph, {
         ends: ["nodeB", "nodeC"],
     })
