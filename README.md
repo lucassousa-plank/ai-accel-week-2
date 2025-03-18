@@ -86,7 +86,10 @@ The web interface provides two main ways to interact with agents:
 
 ### Available Models
 
-The following models are supported:
+The default model used is:
+- OPENAI gpt-4o-mini (requires OPENAI_API_KEY)
+
+The following models are supported, among others:
 - OpenAI models (requires OPENAI_API_KEY):
   - gpt-3.5-turbo
   - gpt-4
