@@ -1,4 +1,4 @@
-import { StateGraph, Annotation, Send} from "@langchain/langgraph";
+import { StateGraph, Annotation } from "@langchain/langgraph";
 import { loadChatModel } from "./utils.js";
 import { AgentConfigurationAnnotation, ensureAgentConfiguration } from "./configuration.js";
 import { RunnableConfig } from "@langchain/core/runnables";
@@ -6,8 +6,8 @@ import { z } from "zod";
 
 // Graph state
 const StateAnnotation = Annotation.Root({
-    joke: Annotation<string>,
     topic: Annotation<string>,
+    joke: Annotation<string>,
     feedback: Annotation<string>,
     funnyOrNot: Annotation<string>,
 });
@@ -62,7 +62,7 @@ function routeJoke(state: typeof StateAnnotation.State) {
 }
 
 // Build workflow
-const optimizerWorkflow = new StateGraph(StateAnnotation)
+const optimizerWorkflow = new StateGraph(StateAnnotation, AgentConfigurationAnnotation)
     .addNode("llmCallGenerator", llmCallGenerator)
     .addNode("llmCallEvaluator", llmCallEvaluator)
     .addEdge("__start__", "llmCallGenerator")
