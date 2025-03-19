@@ -1,10 +1,12 @@
-import { StateGraph, Annotation } from "@langchain/langgraph";
+import { StateGraph, Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { loadChatModel } from "./utils.js";
 import { AgentConfigurationAnnotation, ensureAgentConfiguration } from "./configuration.js";
 import { RunnableConfig } from "@langchain/core/runnables";
+import { AIMessage } from "@langchain/core/messages";
 
 // Graph state
 const StateAnnotation = Annotation.Root({
+    ...MessagesAnnotation.spec,
     topic: Annotation<string>,
     joke: Annotation<string>,
     improvedJoke: Annotation<string>,
@@ -15,10 +17,14 @@ const StateAnnotation = Annotation.Root({
 
 // First LLM call to generate initial joke
 async function generateJoke(state: typeof StateAnnotation.State, config: RunnableConfig) {
+    if (!state.topic) {
+        state.topic = state.messages[state.messages.length - 1].content as string;
+    }
     const configuration = ensureAgentConfiguration(config);
     const llm = await loadChatModel(configuration.modelName);
-    const msg = await llm.invoke(`Write a short joke about ${state.topic}`);
-    return { joke: msg.content };
+    const generatedJoke = await llm.invoke(`Write a short joke about ${state.topic}`);
+    const msg = new AIMessage(`**Generated joke:** ${generatedJoke.content}`);
+    return { messages: [msg], joke: generatedJoke.content };
 }
 
 // Gate function to check if the joke has a punchline
@@ -34,20 +40,22 @@ function checkPunchline(state: typeof StateAnnotation.State) {
 async function improveJoke(state: typeof StateAnnotation.State, config: RunnableConfig) {
     const configuration = ensureAgentConfiguration(config);
     const llm = await loadChatModel(configuration.modelName);
-    const msg = await llm.invoke(
+    const improvedJoke = await llm.invoke(
         `Make this joke funnier by adding wordplay: ${state.joke}`
     );
-    return { improvedJoke: msg.content };
+    const msg = new AIMessage(`**Improved joke:** ${improvedJoke.content}`);
+    return { messages: [msg], improvedJoke: improvedJoke.content };
 }
 
 // Third LLM call for final polish
 async function polishJoke(state: typeof StateAnnotation.State, config: RunnableConfig) {
     const configuration = ensureAgentConfiguration(config);
     const llm = await loadChatModel(configuration.modelName);
-    const msg = await llm.invoke(
+    const polishedJoke = await llm.invoke(
         `Add a surprising twist to this joke: ${state.improvedJoke}`
     );
-    return { finalJoke: msg.content };
+    const msg = new AIMessage(`**Polished joke:** ${polishedJoke.content}`);
+    return { messages: [msg], finalJoke: polishedJoke.content };
 }
 
 // Build workflow
