@@ -15,6 +15,11 @@ export const ConfigurationSchema = Annotation.Root({
    * The name of the language model to be used by the agent.
    */
   model: Annotation<string>,
+
+  /**
+   * The ID of the user interacting with the agent.
+   */
+  userId: Annotation<string>,
 });
 
 export function ensureConfiguration(
@@ -28,5 +33,6 @@ export function ensureConfiguration(
     systemPromptTemplate:
       configurable.systemPromptTemplate ?? SYSTEM_PROMPT_TEMPLATE,
     model: configurable.model ?? "openai/gpt-4o-mini",
+    userId: configurable.userId ?? "defaultUser",
   };
 }

@@ -1,19 +1,39 @@
 import { AIMessage } from "@langchain/core/messages";
-import { RunnableConfig } from "@langchain/core/runnables";
-import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import { LangGraphRunnableConfig, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-
+import { v4 as uuidv4 } from "uuid";
+import { MemorySaver } from "@langchain/langgraph-checkpoint";
+import { InMemoryStore } from "@langchain/langgraph";
 import { ConfigurationSchema, ensureConfiguration } from "./configuration.js";
 import { TOOLS } from "./tools.js";
 import { loadChatModel } from "./utils.js";
 
+const inMemoryStore = new InMemoryStore();
+
 // Define the function that calls the model
 async function callModel(
   state: typeof MessagesAnnotation.State,
-  config: RunnableConfig,
+  config: LangGraphRunnableConfig,
 ): Promise<typeof MessagesAnnotation.Update> {
   /** Call the LLM powering our agent. **/
   const configuration = ensureConfiguration(config);
+  const store = config.store;
+  if (!store) {
+    throw new Error("Store is required for this graph");
+  }
+  if (!configuration.userId) {
+    throw new Error("User ID is required");
+  }
+  const namespace = ["memories", configuration.userId];
+  const memories = await store.search(namespace);
+  const info = memories.map((d) => d.value.data).join("\n");
+
+  const lastMessage = state.messages[state.messages.length - 1];
+  if (typeof lastMessage.content === "string" && lastMessage.content.toLowerCase().includes("remember")) {
+    await store.put(namespace, uuidv4(), {
+      data: lastMessage.content,
+    });
+  }
 
   // Feel free to customize the prompt, model, and other logic!
   const model = (await loadChatModel(configuration.model)).bindTools(TOOLS);
@@ -24,7 +44,7 @@ async function callModel(
       content: configuration.systemPromptTemplate.replace(
         "{system_time}",
         new Date().toISOString(),
-      ),
+      ).replace("{user_info}", info),
     },
     ...state.messages,
   ]);
@@ -70,6 +90,8 @@ const workflow = new StateGraph(MessagesAnnotation, ConfigurationSchema)
 // Finally, we compile it!
 // This compiles it into a graph you can invoke and deploy.
 export const graph = workflow.compile({
+  checkpointer: new MemorySaver(),
+  store: inMemoryStore,
   interruptBefore: [], // if you want to update the state before calling the tools
   interruptAfter: [],
 });
