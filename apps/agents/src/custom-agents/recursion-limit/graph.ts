@@ -80,17 +80,17 @@ export const graph = graphWithLoops.compile({
     interruptAfter: [],
 });
 
-try {
-    graph.invoke({
-        maxCount: 10,
-    },
-        {
-            recursionLimit: 4
-        });
-} catch (error) {
-    if (error instanceof GraphRecursionError) {
-        console.log("Recursion Error:", error);
-    } else {
-        throw error;
-    }
-}
+// try {
+//     graph.invoke({
+//         maxCount: 10,
+//     },
+//         {
+//             recursionLimit: 4
+//         });
+// } catch (error) {
+//     if (error instanceof GraphRecursionError) {
+//         console.log("Recursion Error:", error);
+//     } else {
+//         throw error;
+//     }
+// }

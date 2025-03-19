@@ -61,8 +61,8 @@ export const graph = commandGraph.compile({
     interruptAfter: [],
 });
 
-try {
-    graph.invoke({});
-} catch (error) {
-    throw error;
-}
+// try {
+//     graph.invoke({});
+// } catch (error) {
+//     throw error;
+// }
