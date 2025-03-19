@@ -1,53 +1,73 @@
-import { AIMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { LangGraphRunnableConfig, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { v4 as uuidv4 } from "uuid";
-import { MemorySaver } from "@langchain/langgraph-checkpoint";
-import { InMemoryStore } from "@langchain/langgraph";
+// import { InMemoryStore } from "@langchain/langgraph";
 import { ConfigurationSchema, ensureConfiguration } from "./configuration.js";
 import { TOOLS } from "./tools.js";
 import { loadChatModel } from "./utils.js";
+import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 
-const inMemoryStore = new InMemoryStore();
+import pg from "pg";
+import { RunnableConfig } from "@langchain/core/runnables";
+
+const { Pool } = pg;
+
+console.log("Connecting to database", process.env.SUPABASE_DATABASE_URI);
+const pool = new Pool({
+  connectionString: process.env.SUPABASE_DATABASE_URI,
+});
+
+pool.on('connect', () => console.log('Pool connected'));
+pool.on('error', (err) => console.error('Pool error:', err));
+
+const checkpointer = new PostgresSaver(pool);
+await checkpointer.setup();
+
+// const inMemoryStore = new InMemoryStore();
 
 // Define the function that calls the model
 async function callModel(
   state: typeof MessagesAnnotation.State,
-  config: LangGraphRunnableConfig,
+  config: RunnableConfig,
 ): Promise<typeof MessagesAnnotation.Update> {
+  console.log("Chat agent running for thread:", config?.configurable?.thread_id);
+  console.log("config:", config);
+  config.configurable = { thread_id: config?.configurable?.thread_id }
   /** Call the LLM powering our agent. **/
   const configuration = ensureConfiguration(config);
-  const store = config.store;
-  if (!store) {
-    throw new Error("Store is required for this graph");
-  }
-  if (!configuration.userId) {
-    throw new Error("User ID is required");
-  }
-  const namespace = ["memories", configuration.userId];
-  const memories = await store.search(namespace);
-  const info = memories.map((d) => d.value.data).join("\n");
+  const _config =  { configurable: { thread_id: config?.configurable?.thread_id }}
+  // const store = config.store;
+  // if (!store) {
+  //   throw new Error("Store is required for this graph");
+  // }
+  // if (!configuration.userId) {
+  //   throw new Error("User ID is required");
+  // }
+  // const namespace = ["memories", configuration.userId];
+  // const memories = await store.search(namespace);
+  // const info = memories.map((d) => d.value.data).join("\n");
 
-  const lastMessage = state.messages[state.messages.length - 1];
-  if (typeof lastMessage.content === "string" && lastMessage.content.toLowerCase().includes("remember")) {
-    await store.put(namespace, uuidv4(), {
-      data: lastMessage.content,
-    });
-  }
+  // const lastMessage = state.messages[state.messages.length - 1];
+  // if (typeof lastMessage.content === "string" && lastMessage.content.toLowerCase().includes("remember")) {
+  //   await store.put(namespace, uuidv4(), {
+  //     data: lastMessage.content,
+  //   });
+  // }
 
   // Feel free to customize the prompt, model, and other logic!
-  const model = (await loadChatModel(configuration.model)).bindTools(TOOLS);
-
+  // @ts-ignore
+  const model = (await loadChatModel(configuration.model))?.bindTools(TOOLS);
   const response = await model.invoke([
     {
       role: "system",
       content: configuration.systemPromptTemplate.replace(
         "{system_time}",
         new Date().toISOString(),
-      ).replace("{user_info}", info),
+      ).replace("{user_info}", ""),
     },
     ...state.messages,
-  ]);
+  ], { configurable: _config.configurable });
 
   // We return a list, because this will get added to the existing list
   return { messages: [response] };
@@ -69,7 +89,7 @@ function routeModelOutput(state: typeof MessagesAnnotation.State): string {
 
 // Define a new graph. We use the prebuilt MessagesAnnotation to define state:
 // https://langchain-ai.github.io/langgraphjs/concepts/low_level/#messagesannotation
-const workflow = new StateGraph(MessagesAnnotation, ConfigurationSchema)
+const workflow = new StateGraph(MessagesAnnotation, ConfigurationSchema )
   // Define the two nodes we will cycle between
   .addNode("callModel", callModel)
   .addNode("tools", new ToolNode(TOOLS))
@@ -90,8 +110,13 @@ const workflow = new StateGraph(MessagesAnnotation, ConfigurationSchema)
 // Finally, we compile it!
 // This compiles it into a graph you can invoke and deploy.
 export const graph = workflow.compile({
-  checkpointer: new MemorySaver(),
-  store: inMemoryStore,
+  checkpointer: checkpointer,
+  // store: inMemoryStore,
   interruptBefore: [], // if you want to update the state before calling the tools
   interruptAfter: [],
 });
+
+
+// const config = { configurable: { thread_id: "123" } };
+// const input = { messages: [new HumanMessage("Hello")] };
+// await graph.invoke(input, config);
