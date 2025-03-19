@@ -1,4 +1,4 @@
-import { StateGraph, Annotation, END, GraphRecursionError } from "@langchain/langgraph";
+import { StateGraph, Annotation, END } from "@langchain/langgraph";
 
 // Graph state
 // Define the state with a reducer
@@ -80,6 +80,7 @@ export const graph = graphWithLoops.compile({
     interruptAfter: [],
 });
 
+// import { GraphRecursionError } from "@langchain/langgraph";
 // try {
 //     graph.invoke({
 //         maxCount: 10,
