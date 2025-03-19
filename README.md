@@ -103,14 +103,19 @@ Create a `.env` file with your API keys:
 ```env
 OPENAI_API_KEY=your_key_here
 ANTHROPIC_API_KEY=your_key_here
+LANGCHAIN_TRACING_V2=your_key_here
+LANGCHAIN_ENDPOINT=your_key_here
+LANGCHAIN_API_KEY=your_key_here
+LANGCHAIN_PROJECT=your_key_here
 ```
 
 ## Custom Agents in Studio
 
 While the chat interface has limited support for custom models, all custom agents are available in the LangGraph Studio:
 
-1. Open http://localhost:2024
-2. Select an agent from the dropdown:
+1. Run the project with `npm run dev`
+2. If you've set the env variables right, a tab will open on Langsmith Studio
+3. Select an agent from the dropdown:
    - branching
    - command
    - map-reduce
@@ -120,8 +125,8 @@ While the chat interface has limited support for custom models, all custom agent
    - parallelization
    - prompt_chaining
    - routing
-3. Test the agent with different inputs
-4. Use the visualization tools to debug and understand the flow
+4. Test the agent with different inputs
+5. Use the visualization tools to debug and understand the flow
 
 ## Development
 
