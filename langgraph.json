@@ -17,7 +17,8 @@
     "custom/recursion_limit": "./apps/agents/src/custom-agents/recursion-limit/graph.ts:graph",
     "custom/command": "./apps/agents/src/custom-agents/command/graph.ts:graph",
     "custom/branching": "./apps/agents/src/custom-agents/branching/graph.ts:graph",
-    "custom/map_reduce": "./apps/agents/src/custom-agents/map-reduce/graph.ts:graph"
+    "custom/map_reduce": "./apps/agents/src/custom-agents/map-reduce/graph.ts:graph",
+    "custom/postgres_persistence": "./apps/agents/src/custom-agents/postgres-persistence/graph.ts:graph"
   },
   "env": ".env"
 }
