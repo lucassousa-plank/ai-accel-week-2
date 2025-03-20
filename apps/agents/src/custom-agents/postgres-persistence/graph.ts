@@ -1,7 +1,6 @@
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { LangGraphRunnableConfig, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import { AIMessage } from "@langchain/core/messages";
+import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { v4 as uuidv4 } from "uuid";
 // import { InMemoryStore } from "@langchain/langgraph";
 import { ConfigurationSchema, ensureConfiguration } from "./configuration.js";
 import { TOOLS } from "./tools.js";
@@ -36,7 +35,7 @@ async function callModel(
   config.configurable = { thread_id: config?.configurable?.thread_id }
   /** Call the LLM powering our agent. **/
   const configuration = ensureConfiguration(config);
-  const _config =  { configurable: { thread_id: config?.configurable?.thread_id }}
+  // const _config = { configurable: { thread_id: config?.configurable?.thread_id } }
   // const store = config.store;
   // if (!store) {
   //   throw new Error("Store is required for this graph");
@@ -67,7 +66,7 @@ async function callModel(
       ).replace("{user_info}", ""),
     },
     ...state.messages,
-  ], { configurable: _config.configurable });
+  ]);
 
   // We return a list, because this will get added to the existing list
   return { messages: [response] };
