@@ -1,17 +1,20 @@
 import { Annotation, LangGraphRunnableConfig, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { InMemoryStore, START, END } from "@langchain/langgraph";
 import { initializeTools } from "./tools.js";
-import "@tensorflow/tfjs-backend-cpu";
-import { TensorFlowEmbeddings } from "@langchain/community/embeddings/tensorflow";
 import { ConfigurationSchema, ensureAgentConfiguration } from "./configuration.js";
 import { loadChatModel } from "./utils.js";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
+import { OpenAIEmbeddings } from "@langchain/openai";
+
 
 const StateAnnotation = Annotation.Root({
   ...MessagesAnnotation.spec,
 });
 
-const embeddings = new TensorFlowEmbeddings();
+
+const embeddings = new OpenAIEmbeddings({
+  model: "text-embedding-3-small",
+});
 
 const store = new InMemoryStore({
   index: {
