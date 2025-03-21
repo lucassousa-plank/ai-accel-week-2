@@ -19,7 +19,8 @@
     "custom/branching": "./apps/agents/src/custom-agents/branching/graph.ts:graph",
     "custom/map_reduce": "./apps/agents/src/custom-agents/map-reduce/graph.ts:graph",
     "custom/postgres_persistence": "./apps/agents/src/custom-agents/postgres-persistence/graph.ts:graph",
-    "custom/semantic_search": "./apps/agents/src/custom-agents/semantic-search/graph.ts:graph"
+    "custom/semantic_search": "./apps/agents/src/custom-agents/semantic-search/graph.ts:graph",
+    "custom/customer_support": "./apps/agents/src/custom-agents/customer-support/graph.ts:graph"
   },
   "env": ".env"
 }
